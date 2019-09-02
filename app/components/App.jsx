@@ -5,6 +5,7 @@ import LoginPage from './Login/LoginPage';
 
 import WithStoreSubscription from "./Common/hocs/WithStoreSubscriptions";
 import LoginStore from "../stores/LoginStore";
+import HorizontalNavbar from "./Navigation/HorizontalNavbar";
 
 @WithStoreSubscription([LoginStore])
 class App extends React.Component {
@@ -16,6 +17,7 @@ class App extends React.Component {
 		}
 
 		return (<div>
+			<HorizontalNavbar user={this.props.user}/>
 			<Main></Main>
 		</div>);
 	}

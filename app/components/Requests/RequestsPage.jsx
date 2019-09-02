@@ -1,23 +1,23 @@
 import React from 'react';
 import {Modal} from "react-bootstrap";
+import _ from "lodash";
 
 import AssignApprover from "./AssignApprover";
+import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
+import RequestsStore from "../../stores/RequestsStore";
+import RequestsActions from "../../actions/RequestsActions";
+import LoginStore from "../../stores/LoginStore";
+import LoginActions from "../../actions/LoginActions";
 
+@WithStoreSubscription([RequestsStore, LoginStore], [RequestsActions.fetchRequests.defer])
 class RequestsPage extends React.Component{
 
 	constructor() {
 		super();
 		this.state = {
-
+			requests: [],
+			fetchingRequests: false
 		};
-	}
-
-	componentDidMount() {
-
-	}
-
-	componentWillUnmount() {
-
 	}
 
 	onAssignCompleted = () => {
@@ -32,6 +32,29 @@ class RequestsPage extends React.Component{
 	}
 
 	render() {
+
+        const renderStatus = (request, number) => request["approver" + number] === this.props.user ? (request["status" + number] === "Pending" ? <div className="btn-group-sm" role="group">
+            <button type="button" className="btn btn-primary" onClick={this.onSubmit.bind(this)}>Approve</button>
+            <button type="button" className="btn btn-secondary">Decline</button>
+        </div> : request["status" + number]) : request["status" + number];
+
+		const renderRequests = _.map(this.props.requests, request => {
+            console.log(this.props);
+
+            return (
+                <tr key={request.processId}>
+                    <th scope="row">{request.processId}</th>
+					<td>{request.requester}</td>
+                    <td>{request.approver1 || '-'}</td>
+                    <td>{renderStatus(request, 1) || '-'}</td>
+                    <td>{request.approver2 || '-'}</td>
+                    <td>{renderStatus(request, 2) || '-'}</td>
+                    <td>{request.approver3 || '-'}</td>
+                    <td>{renderStatus(request, 3) || '-'}</td>
+                </tr>
+            );
+        });
+
 		return (<React.Fragment>
 			<h1>Requests</h1>
 
@@ -42,6 +65,7 @@ class RequestsPage extends React.Component{
 					<thead>
 					<tr>
 						<th scope="col">PID</th>
+						<th scope="col">Requester</th>
 						<th scope="col">First Approver</th>
 						<th scope="col">Status</th>
 						<th scope="col">Second Approver</th>
@@ -51,38 +75,7 @@ class RequestsPage extends React.Component{
 					</tr>
 					</thead>
 					<tbody>
-					<tr>
-						<th scope="row">1</th>
-						<td>Mark Jacob</td>
-						<td>
-							<div className="btn-group-sm" role="group">
-								<button type="button" className="btn btn-primary" onClick={this.onSubmit.bind(this)}>Approve</button>
-								<button type="button" className="btn btn-secondary">Decline</button>
-							</div>
-						</td>
-						<td>-</td>
-						<td>-</td>
-						<td>-</td>
-						<td>-</td>
-					</tr>
-					<tr>
-						<th scope="row">2</th>
-						<td>Sean Duncan</td>
-						<td>Approved</td>
-						<td>Zion Bradley</td>
-						<td>Approved</td>
-						<td>Will Jenkins</td>
-						<td>Declined</td>
-					</tr>
-					<tr>
-						<th scope="row">3</th>
-						<td>John Braun</td>
-						<td>Approved</td>
-						<td>Zion Bradley</td>
-						<td>Pending</td>
-						<td>-</td>
-						<td>-</td>
-					</tr>
+					{renderRequests}
 					</tbody>
 				</table>
 			</div>
