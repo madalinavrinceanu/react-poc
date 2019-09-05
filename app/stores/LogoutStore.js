@@ -1,41 +1,26 @@
 import alt from "../alt";
-import LoginActions from "../actions/LoginActions";
+import LogoutActions from "../actions/LogoutActions";
 
-class LoginStore {
-    constructor() {
-        this.token = null;
-        this.user = null;
-        this.roles = [];
-        this.isUserAuthenticated = false;
+class LogoutStore {
+	constructor() {
+		this.token = null;
+		this.user = null;
+		this.roles = [];
+		this.isUserAuthenticated = false;
 
-        this.bindListeners({
-            handleLogin: LoginActions.login,
-            handleLoginCompleted: LoginActions.loginComplete,
-        });
-    }
+		this.bindListeners({
+			handleLogoutCompleted: LogoutActions.logoutComplete
+		});
+	}
 
-    handleLogin() {
-        this.token = null;
-        this.user = null;
-        this.roles = [];
-        this.isUserAuthenticated = false;
-    }
-
-    handleLoginCompleted(data) {
-        this.token = data.token;
-        this.user = data.username;
-        this.roles = data.roles;
-        this.isUserAuthenticated = true;
-        window.localStorage.setItem("authToken", data.token);
-    }
-
-    handleValidateToken() {
-        this.token = null;
-        this.user = null;
-        this.roles = [];
-        this.isUserAuthenticated = false;
-    }
+	handleLogoutCompleted() {
+		this.token = null;
+		this.user = null;
+		this.roles = null;
+		this.isUserAuthenticated = false;
+		window.localStorage.removeItem("authToken");
+	}
 
 }
 
-export default alt.createStore(LoginStore, 'LoginStore');
+export default alt.createStore(LogoutStore, 'LogoutStore');

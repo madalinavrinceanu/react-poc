@@ -6,8 +6,9 @@ import LoginPage from './Login/LoginPage';
 import WithStoreSubscription from "./Common/hocs/WithStoreSubscriptions";
 import LoginStore from "../stores/LoginStore";
 import HorizontalNavbar from "./Navigation/HorizontalNavbar";
+import LogoutStore from "../stores/LogoutStore";
 
-@WithStoreSubscription([LoginStore])
+@WithStoreSubscription([LoginStore, LogoutStore])
 class App extends React.Component {
 
 	render() {

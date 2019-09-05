@@ -39,8 +39,6 @@ class RequestsPage extends React.Component{
         </div> : request["status" + number]) : request["status" + number];
 
 		const renderRequests = _.map(this.props.requests, request => {
-            console.log(this.props);
-
             return (
                 <tr key={request.processId}>
                     <th scope="row">{request.processId}</th>
