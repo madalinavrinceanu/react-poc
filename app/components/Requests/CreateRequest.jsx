@@ -1,7 +1,7 @@
 import React from 'react';
 import RequestsActions from "../../actions/RequestsActions";
 
-export default class AssignApprover extends React.Component {
+export default class CreateRequest extends React.Component {
 
 	constructor() {
 		super();
@@ -16,16 +16,17 @@ export default class AssignApprover extends React.Component {
 
 	onSubmit() {
 		event.preventDefault();
-		RequestsActions.completeRequest(
-			12, //todo
-			{
-			secondApprover: this.state.approver, //todo
+		RequestsActions.createRequest({
+			requesterId: this.props.requesterId,
+			firstApprover: this.state.firstApprover
 		});
-		this.props.onAssignCompleted();
+		this.props.onCreateCompleted();
 	}
 
 	inputChanged = (value) => {
 		this.setState({...value, formChanged: true});
+		console.log(this.props);
+		console.log(this.state);
 	};
 
 	render() {
@@ -36,7 +37,7 @@ export default class AssignApprover extends React.Component {
 					<div className="form-group">
 						<label htmlFor="approver">Approver</label>
 						<select name="" id="approver" className="form-control" required onChange={(event) => {
-							this.inputChanged({approver: event.target.value});}}>
+							this.inputChanged({firstApprover: event.target.value});}}>
 							<option>Select Approver</option>
 							{this.state.approvers.map((approver) =>
 								<option key={approver.id} value={approver.id}>

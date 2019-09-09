@@ -4,15 +4,14 @@ import HttpUtils from '../components/Common/HttpUtils';
 
 class RequestsActions {
 
-    fetchRequests(requestParams) {
+    fetchRequests(userId) {
         const requestOptions = HttpUtils.getDefaultOptions();
-        requestOptions.url = requestOptions.baseURL + '/owners';
+        requestOptions.url = requestOptions.baseURL + 'api/requests/' + userId;
         requestOptions.method = 'GET';
-        requestOptions.data = requestParams;
 
         axios(requestOptions)
             .then((response) => this.fetchRequestsComplete(response.data))
-            .catch((err) => this.fetchRequestsComplete());
+            .catch();
 
         return null;
     }
@@ -26,7 +25,47 @@ class RequestsActions {
         return requests;
     }
 
+    createRequest(requestParams) {
+	    const requestOptions = HttpUtils.getDefaultOptions();
+	    requestOptions.url = requestOptions.baseURL + 'api/requests';
+	    requestOptions.method = 'POST';
+	    requestOptions.data = requestParams;
 
+	    axios(requestOptions)
+		    .then((response) => this.createRequestComplete(response.data))
+		    .catch((err) => this.createRequestComplete);
+
+	    return null;
+    }
+
+	createRequestComplete(data) {
+
+    }
+
+    completeRequest(taskId, requestParams) {
+	    const requestOptions = HttpUtils.getDefaultOptions();
+	    requestOptions.url = requestOptions.baseURL + 'api/requests/complete/' + taskId;
+	    requestOptions.method = 'POST';
+	    requestOptions.data = requestParams;
+
+	    axios(requestOptions)
+		    .then((response) => this.createRequestComplete(response.data))
+		    .catch((err) => this.createRequestComplete);
+
+	    return null;
+    }
+
+    startTaskRequest(taskId) {
+	    const requestOptions = HttpUtils.getDefaultOptions();
+	    requestOptions.url = requestOptions.baseURL + 'api/requests/start/' + taskId;
+	    requestOptions.method = 'POST';
+
+	    axios(requestOptions)
+		    .then((response) => this.createRequestComplete(response.data))
+		    .catch((err) => this.createRequestComplete);
+
+	    return null;
+    }
 }
 
 export default alt.createActions(RequestsActions);

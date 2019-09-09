@@ -8,8 +8,11 @@ import RequestsStore from "../../stores/RequestsStore";
 import RequestsActions from "../../actions/RequestsActions";
 import LoginStore from "../../stores/LoginStore";
 import LoginActions from "../../actions/LoginActions";
+import AccountStore from "../../stores/AccountStore";
+import AccountActions from "../../actions/AccountActions";
+import CreateRequest from "./CreateRequest";
 
-@WithStoreSubscription([RequestsStore, LoginStore], [RequestsActions.fetchRequests.defer])
+@WithStoreSubscription([AccountStore], [AccountActions.fetchAccount.defer])
 class RequestsPage extends React.Component{
 
 	constructor() {
@@ -20,25 +23,51 @@ class RequestsPage extends React.Component{
 		};
 	}
 
-	onAssignCompleted = () => {
-		this.setState({show:false});
+	componentDidMount() {
+		RequestsStore.listen(this.onRequestStoreChanged);
+		if(this.props.userId) {
+			RequestsActions.fetchRequests.defer(this.props.userId);
+		}
+	}
+
+	componentWillUnmount() {
+		RequestsStore.unlisten(this.onRequestStoreChanged);
+	}
+
+	onRequestStoreChanged = store => {
+		this.setState({...store});
+		console.log(this.state);
 	};
 
-	onSubmit() {
+	onSubmitAssign() {
 		event.preventDefault();
-		this.setState({show:true});
-		console.log(this.state);
+		this.setState({showAssignModal:true});
+		RequestsActions.startTaskRequest(12);
+	}
 
+	onAssignCompleted = () => {
+		this.setState({showAssignModal:false});
+	};
+
+	onSubmitCreate() {
+		event.preventDefault();
+		this.setState({showCreateModal:true});
+	}
+
+	onCreateCompleted() {
+		this.setState({showCreateModal:false});
 	}
 
 	render() {
 
-        const renderStatus = (request, number) => request["approver" + number] === this.props.user ? (request["status" + number] === "Pending" ? <div className="btn-group-sm" role="group">
-            <button type="button" className="btn btn-primary" onClick={this.onSubmit.bind(this)}>Approve</button>
-            <button type="button" className="btn btn-secondary">Decline</button>
-        </div> : request["status" + number]) : request["status" + number];
+        const renderStatus = (request, number) => request["approver" + number] === this.props.user ? (request["status" + number] === "Pending" ?
+	        <div className="btn-group-sm" role="group" >
+                <button type="button" className="btn btn-primary" onClick={this.onSubmitAssign.bind(this)}>Approve</button>
+                <button type="button" className="btn btn-secondary">Decline</button>
+            </div>
+	        : request["status" + number]) : request["status" + number];
 
-		const renderRequests = _.map(this.props.requests, request => {
+		const renderRequests = _.map(this.state.requests, request => {
             return (
                 <tr key={request.processId}>
                     <th scope="row">{request.processId}</th>
@@ -56,8 +85,9 @@ class RequestsPage extends React.Component{
 		return (<React.Fragment>
 			<h1>Requests</h1>
 
-			{/*<input type="submit" className="float-right" value="Create Request" onClick={this.onSubmit.bind(this)}/>*/}
+			{this.renderCreateModal()}
 			{this.renderAssignModal()}
+			{this.renderCreateButton()}
 			<div className="standard-container">
 				<table className="table table-striped">
 					<thead>
@@ -73,28 +103,46 @@ class RequestsPage extends React.Component{
 					</tr>
 					</thead>
 					<tbody>
-					{renderRequests}
+						{renderRequests}
 					</tbody>
 				</table>
 			</div>
 			</React.Fragment>);
 	}
 
-
 	renderAssignModal = () => {
 		return (
-			<Modal show={this.state.show} onHide={() => this.onAssignCompleted()}>
+			<Modal show={this.state.showAssignModal} onHide={() => this.onAssignCompleted()}>
 				<Modal.Header closeButton>
 					<Modal.Title>Assign next approver</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<AssignApprover onAssignCompleted={() => this.onAssignCompleted()}></AssignApprover>
+					<AssignApprover onAssignCompleted={() => this.onAssignCompleted()} taskId={this.state.taskId}></AssignApprover>
 				</Modal.Body>
 			</Modal>
 		);
 	};
 
+	renderCreateModal = () => {
+		return (
+			<Modal show={this.state.showCreateModal} onHide={() => this.onCreateCompleted()}>
+				<Modal.Header closeButton>
+					<Modal.Title>Assign approver</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<CreateRequest onCreateCompleted={() => this.onCreateCompleted()} requesterId={this.props.userId}></CreateRequest>
+				</Modal.Body>
+			</Modal>
+		);
+	};
 
+	renderCreateButton = () => {
+		return( this.props.roles ? (
+			this.props.roles.indexOf("ROLE_ADMIN") >= 0 ?
+					<input type="submit" className="float-right" value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
+				: null ) : null
+		);
+	}
 }
 
 

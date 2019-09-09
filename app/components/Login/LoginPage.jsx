@@ -16,7 +16,8 @@ class LoginPage extends React.Component {
 		// this.state.isUserAuthenticated = true;
 		LoginActions.login({
 			username: this.state.username,
-			password: this.state.password
+			password: this.state.password,
+			submit: "Login"
 		});
 	}
 

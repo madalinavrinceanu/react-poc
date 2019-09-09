@@ -5,9 +5,9 @@ import HttpUtils from '../components/Common/HttpUtils';
 class LogoutActions {
 
     logout() {
-        const token = window.localStorage.getItem("authToken");
+        // const token = window.localStorage.getItem("authToken");
         const requestOptions = HttpUtils.getDefaultOptions();
-        requestOptions.url = requestOptions.baseURL + '/auth/logout?token=' + token;
+        requestOptions.url = requestOptions.baseURL + 'api/logout';
         requestOptions.method = 'POST';
 
         axios(requestOptions)
@@ -18,7 +18,8 @@ class LogoutActions {
     }
 
     logoutComplete() {
-        return null;
+	    window.localStorage.removeItem("isUserAuthenticated");
+	    return null;
     }
 }
 

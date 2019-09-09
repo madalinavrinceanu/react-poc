@@ -4,11 +4,11 @@ export default class HttpUtils {
 	 */
 	static getDefaultOptions() {
 		return {
-			baseURL: 'localhost:8081/api',
-			headers: {
-				"Content-Type": "application/json; charset=utf-8",
-				'Accept': 'application/json, text/plain, */*'
-			},
+			baseURL: '',
+			// headers: {
+			// 	'Content-Type': 'application/json; charset=utf-8',
+			// 	'Accept': 'application/json, text/plain, */*'
+			// },
 			method: 'GET'
 		};
 	}

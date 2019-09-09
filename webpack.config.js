@@ -27,7 +27,20 @@ const config = {
 		hot: true,
 		contentBase: resolve(__dirname, 'build'),
 		historyApiFallback: true,
-		publicPath: '/'
+		publicPath: '/',
+		proxy: [{
+			context: [
+				'/api',
+				'/services',
+				'/management',
+				'/swagger-resources',
+				'/v2/api-docs',
+				'/h2-console',
+				'/auth'
+			],
+			target: `http://localhost:8080`,
+			secure: false
+		}],
 	},
 
 	resolve: {

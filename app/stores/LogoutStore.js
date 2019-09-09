@@ -3,7 +3,6 @@ import LogoutActions from "../actions/LogoutActions";
 
 class LogoutStore {
 	constructor() {
-		this.token = null;
 		this.user = null;
 		this.roles = [];
 		this.isUserAuthenticated = false;
@@ -14,11 +13,9 @@ class LogoutStore {
 	}
 
 	handleLogoutCompleted() {
-		this.token = null;
 		this.user = null;
 		this.roles = null;
 		this.isUserAuthenticated = false;
-		window.localStorage.removeItem("authToken");
 	}
 
 }
