@@ -18,7 +18,7 @@ class AssignApprover extends React.Component {
 	onSubmit() {
 		event.preventDefault();
 		RequestsActions.completeRequest(
-			12, //todo
+			16, //todo
 			{
 			secondApprover: this.state.approver, //todo
 		});
@@ -39,9 +39,9 @@ class AssignApprover extends React.Component {
 						<select name="" id="approver" className="form-control" required onChange={(event) => {
 							this.inputChanged({approver: event.target.value});}}>
 							<option>Select Approver</option>
-							{this.state.approvers.map((approver) =>
+							{this.props.approvers.map((approver) =>
 								<option key={approver.id} value={approver.id}>
-									{approver.name}
+									{approver.firstName} {approver.lastName}
 								</option>
 							)}
 						</select>

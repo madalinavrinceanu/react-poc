@@ -42,7 +42,7 @@ class RequestsPage extends React.Component{
 	onSubmitAssign() {
 		event.preventDefault();
 		this.setState({showAssignModal:true});
-		RequestsActions.startTaskRequest(12);
+		RequestsActions.startTaskRequest(16);
 	}
 
 	onAssignCompleted = () => {
@@ -70,7 +70,7 @@ class RequestsPage extends React.Component{
 		const renderRequests = _.map(this.state.requests, request => {
             return (
                 <tr key={request.processId}>
-                    <th>{request.processId}</th>
+                    <th scope="row">{request.processId}</th>
 	                <th>{request.date || '10 Sept 2019'}</th>
 	                <td>{request.requester}</td>
                     <td>{request.approver1 || '-'}</td>
