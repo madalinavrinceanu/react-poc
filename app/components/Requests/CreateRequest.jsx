@@ -1,16 +1,16 @@
 import React from 'react';
 import RequestsActions from "../../actions/RequestsActions";
+import AccountActions from "../../actions/AccountActions";
+import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
+import AccountStore from "../../stores/AccountStore";
 
-export default class CreateRequest extends React.Component {
+@WithStoreSubscription([AccountStore], [AccountActions.fetchUsersByRole.defer])
+class CreateRequest extends React.Component {
 
 	constructor() {
 		super();
 		this.state = {
-			formChanged: false,
-			approvers: [
-				{id: 1, name: "Ion Popescu"},
-				{id: 2, name: "Mircea Ionescu"}
-			]
+			formChanged: false
 		};
 	}
 
@@ -30,6 +30,7 @@ export default class CreateRequest extends React.Component {
 	};
 
 	render() {
+		console.log(this.props);
 		return(
 			<div>
 
@@ -39,9 +40,9 @@ export default class CreateRequest extends React.Component {
 						<select name="" id="approver" className="form-control" required onChange={(event) => {
 							this.inputChanged({firstApprover: event.target.value});}}>
 							<option>Select Approver</option>
-							{this.state.approvers.map((approver) =>
+							{this.props.approvers.map((approver) =>
 								<option key={approver.id} value={approver.id}>
-									{approver.name}
+									{approver.firstName} {approver.lastName}
 								</option>
 							)}
 						</select>
@@ -52,3 +53,5 @@ export default class CreateRequest extends React.Component {
 		);
 	}
 }
+
+export default CreateRequest;

@@ -19,9 +19,9 @@ class AccountActions {
 		return data;
 	}
 
-	fetchUsersByRole(role) {
+	fetchUsersByRole() {
 		const requestOptions = HttpUtils.getDefaultOptions();
-		requestOptions.url = requestOptions.baseURL + 'api/users/' + role;
+		requestOptions.url = requestOptions.baseURL + 'api/users/approvers';
 
 		axios(requestOptions)
 			.then((response) => this.fetchUsersByRoleCompleted(response.data))

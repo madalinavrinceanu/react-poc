@@ -1,16 +1,17 @@
 import React from 'react';
 import RequestsActions from "../../actions/RequestsActions";
+import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
+import AccountActions from "../../actions/AccountActions";
+import AccountStore from "../../stores/AccountStore";
 
-export default class AssignApprover extends React.Component {
+@WithStoreSubscription([AccountStore], [AccountActions.fetchUsersByRole.defer])
+class AssignApprover extends React.Component {
 
 	constructor() {
 		super();
 		this.state = {
 			formChanged: false,
-			approvers: [
-				{id: 1, name: "Ion Popescu"},
-				{id: 2, name: "Mircea Ionescu"}
-			]
+			approvers: []
 		};
 	}
 
@@ -51,3 +52,5 @@ export default class AssignApprover extends React.Component {
 		);
 	}
 }
+
+export default AssignApprover;

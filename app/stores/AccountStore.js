@@ -7,12 +7,13 @@ class AccountStore {
 		this.roles = [];
 		this.isUserAuthenticated = false;
 		this.userId = null;
-		this.users = [];
+		this.approvers = [];
 
 		this.bindListeners({
 			fetchAccount: AccountActions.fetchAccount,
 			fetchAccountComplete: AccountActions.fetchAccountComplete,
-			fetchUsersByRole: AccountActions.fetchUsersByRole
+			fetchUsersByRole: AccountActions.fetchUsersByRole,
+			fetchUsersByRoleCompleted: AccountActions.fetchUsersByRoleCompleted
 		});
 	}
 
@@ -28,8 +29,12 @@ class AccountStore {
 		this.isUserAuthenticated = true;
 	}
 
-	fetchUsersByRole(data) {
-		this.users = data;
+	fetchUsersByRole() {
+		this.approvers = [];
+	}
+
+	fetchUsersByRoleCompleted(data) {
+		this.approvers = data;
 	}
 }
 

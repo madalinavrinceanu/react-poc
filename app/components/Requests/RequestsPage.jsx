@@ -70,8 +70,9 @@ class RequestsPage extends React.Component{
 		const renderRequests = _.map(this.state.requests, request => {
             return (
                 <tr key={request.processId}>
-                    <th scope="row">{request.processId}</th>
-					<td>{request.requester}</td>
+                    <th>{request.processId}</th>
+	                <th>{request.date || '10 Sept 2019'}</th>
+	                <td>{request.requester}</td>
                     <td>{request.approver1 || '-'}</td>
                     <td>{renderStatus(request, 1) || '-'}</td>
                     <td>{request.approver2 || '-'}</td>
@@ -93,6 +94,7 @@ class RequestsPage extends React.Component{
 					<thead>
 					<tr>
 						<th scope="col">PID</th>
+						<th scope="col">Date</th>
 						<th scope="col">Requester</th>
 						<th scope="col">First Approver</th>
 						<th scope="col">Status</th>
@@ -138,7 +140,7 @@ class RequestsPage extends React.Component{
 
 	renderCreateButton = () => {
 		return( this.props.roles ? (
-			this.props.roles.indexOf("ROLE_ADMIN") >= 0 ?
+			this.props.roles.indexOf("0_REQUESTER") >= 0 ?
 					<input type="submit" className="float-right" value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
 				: null ) : null
 		);
