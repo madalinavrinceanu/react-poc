@@ -17,12 +17,12 @@ class RequestsActions {
     }
 
     fetchRequestsComplete(data) {
-        // return data;
+        return data;
         let requests = [
-            {processId: 1, requester: "Requester 1", approver1: "admin", status1: "Pending", approver2: "", status2: "", approver3: "", status3:"" },
+            {processId: 1, requester: "Requester 1", approver1: "approver1.2", status1: "Pending", approver2: "", status2: "", approver3: "", status3:"", taskId: 314},
             {processId: 2, requester: "Requester 1", approver1: "Sean Duncan", status1: "Approved", approver2: "Zion Bradley", status2: "Approved", approver3: "Will Jenkins", status3:"Declined" },
             {processId: 3, requester: "Requester 2", approver1: "John Braun", status1: "Approved", approver2: "Zion Bradley", status2: "Pending", approver3: "", status3:"" }];
-        return requests;
+        // return requests;
     }
 
     createRequest(requestParams) {
@@ -39,7 +39,6 @@ class RequestsActions {
     }
 
 	createRequestComplete(data) {
-
     }
 
     completeRequest(taskId, requestParams) {
@@ -59,6 +58,19 @@ class RequestsActions {
 	    const requestOptions = HttpUtils.getDefaultOptions();
 	    requestOptions.url = requestOptions.baseURL + 'api/requests/start/' + taskId;
 	    requestOptions.method = 'POST';
+
+	    axios(requestOptions)
+		    .then((response) => this.createRequestComplete(response.data))
+		    .catch((err) => this.createRequestComplete);
+
+	    return null;
+    }
+
+    declineRequest(taskId, requestParams) {
+	    const requestOptions = HttpUtils.getDefaultOptions();
+	    requestOptions.url = requestOptions.baseURL + 'api/requests/decline/' + taskId;
+	    requestOptions.method = 'POST';
+	    requestOptions.data = requestParams;
 
 	    axios(requestOptions)
 		    .then((response) => this.createRequestComplete(response.data))

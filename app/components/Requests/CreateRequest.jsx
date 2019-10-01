@@ -4,15 +4,29 @@ import AccountActions from "../../actions/AccountActions";
 import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
 import AccountStore from "../../stores/AccountStore";
 
-@WithStoreSubscription([AccountStore], [AccountActions.fetchUsersByRole.defer])
+// @WithStoreSubscription([AccountStore], [AccountActions.fetchUsersByRole.defer])
 class CreateRequest extends React.Component {
 
 	constructor() {
 		super();
 		this.state = {
-			formChanged: false
+			formChanged: false,
+			approvers: []
 		};
 	}
+	componentDidMount() {
+		AccountStore.listen(this.onAccountStoreChanged);
+		AccountActions.fetchUsersByRole.defer(1);
+	}
+
+	componentWillUnmount() {
+		AccountStore.unlisten(this.onAccountStoreChanged);
+	}
+
+	onAccountStoreChanged = store => {
+		this.setState({...store});
+		console.log(this.state);
+	};
 
 	onSubmit() {
 		event.preventDefault();
@@ -40,7 +54,7 @@ class CreateRequest extends React.Component {
 						<select name="" id="approver" className="form-control" required onChange={(event) => {
 							this.inputChanged({firstApprover: event.target.value});}}>
 							<option>Select Approver</option>
-							{this.props.approvers.map((approver) =>
+							{this.state.approvers.map((approver) =>
 								<option key={approver.id} value={approver.id}>
 									{approver.firstName} {approver.lastName}
 								</option>

@@ -38,7 +38,7 @@ const config = {
 				'/h2-console',
 				'/auth'
 			],
-			target: `http://localhost:8080`,
+			target: `http://localhost:9000`,
 			secure: false
 		}],
 	},

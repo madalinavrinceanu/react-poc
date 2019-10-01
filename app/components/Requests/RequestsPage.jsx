@@ -39,10 +39,15 @@ class RequestsPage extends React.Component{
 		console.log(this.state);
 	};
 
-	onSubmitAssign() {
+	onSubmitAssign(taskId) {
 		event.preventDefault();
 		this.setState({showAssignModal:true});
-		RequestsActions.startTaskRequest(16);
+		RequestsActions.startTaskRequest(taskId);
+	}
+
+	onDecline(taskId, level) {
+		event.preventDefault();
+		RequestsActions.declineRequest(taskId, {["status" + level] : "DECLINED"});
 	}
 
 	onAssignCompleted = () => {
@@ -59,36 +64,37 @@ class RequestsPage extends React.Component{
 	}
 
 	render() {
-
-        const renderStatus = (request, number) => request["approver" + number] === this.props.user ? (request["status" + number] === "Pending" ?
+        const renderStatus = (request, number) => request["approver" + number] === this.props.userId ? (request["status" + number] === "PENDING" ?
 	        <div className="btn-group-sm" role="group" >
-                <button type="button" className="btn btn-primary" onClick={this.onSubmitAssign.bind(this)}>Approve</button>
-                <button type="button" className="btn btn-secondary">Decline</button>
+                <button type="button" className="btn btn-primary" onClick={() => this.onSubmitAssign(request.taskId)}>Approve</button>
+                <button type="button" className="btn btn-secondary" onClick={() => this.onDecline(request.taskId, number)}>Decline</button>
             </div>
 	        : request["status" + number]) : request["status" + number];
 
 		const renderRequests = _.map(this.state.requests, request => {
             return (
-                <tr key={request.processId}>
-                    <th scope="row">{request.processId}</th>
-	                <th>{request.date || '10 Sept 2019'}</th>
-	                <td>{request.requester}</td>
-                    <td>{request.approver1 || '-'}</td>
-                    <td>{renderStatus(request, 1) || '-'}</td>
-                    <td>{request.approver2 || '-'}</td>
-                    <td>{renderStatus(request, 2) || '-'}</td>
-                    <td>{request.approver3 || '-'}</td>
-                    <td>{renderStatus(request, 3) || '-'}</td>
-                </tr>
+	            <React.Fragment>
+		            {this.renderAssignModal(request)}
+		            <tr key={request.processInstanceId}>
+			            <th scope="row">{request.processInstanceId}</th>
+			            <th>{request.date || '10 Sept 2019'}</th>
+			            <td>{request.requesterName}</td>
+			            <td>{request.firstApproverName || '-'}</td>
+			            <td>{renderStatus(request, 1) || '-'}</td>
+			            <td>{request.secondApproverName || '-'}</td>
+			            <td>{renderStatus(request, 2) || '-'}</td>
+			            <td>{request.thirdApproverName || '-'}</td>
+			            <td>{renderStatus(request, 3) || '-'}</td>
+		            </tr>
+	            </React.Fragment>
             );
         });
 
 		return (<React.Fragment>
 			<h1>Requests</h1>
-
 			{this.renderCreateModal()}
-			{this.renderAssignModal()}
 			{this.renderCreateButton()}
+
 			<div className="standard-container">
 				<table className="table table-striped">
 					<thead>
@@ -112,14 +118,14 @@ class RequestsPage extends React.Component{
 			</React.Fragment>);
 	}
 
-	renderAssignModal = () => {
+	renderAssignModal = (request) => {
 		return (
 			<Modal show={this.state.showAssignModal} onHide={() => this.onAssignCompleted()}>
 				<Modal.Header closeButton>
 					<Modal.Title>Assign next approver</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<AssignApprover onAssignCompleted={() => this.onAssignCompleted()} taskId={this.state.taskId}></AssignApprover>
+					<AssignApprover onAssignCompleted={() => this.onAssignCompleted()} request={request}></AssignApprover>
 				</Modal.Body>
 			</Modal>
 		);
@@ -140,7 +146,7 @@ class RequestsPage extends React.Component{
 
 	renderCreateButton = () => {
 		return( this.props.roles ? (
-			this.props.roles.indexOf("0_REQUESTER") >= 0 ?
+			this.props.roles.indexOf("REQUESTER_0") >= 0 ?
 					<input type="submit" className="float-right" value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
 				: null ) : null
 		);
