@@ -1,4 +1,6 @@
 import React from 'react';
+import { withRouter } from "react-router";
+
 import LogoutActions from "../../actions/LogoutActions";
 import LogoutStore from "../../stores/LogoutStore";
 import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
@@ -17,6 +19,7 @@ class Logout extends React.Component {
     onSubmit() {
         event.preventDefault();
         LogoutActions.logout();
+        this.props.history.push("/login");
     }
 
     render() {
@@ -24,4 +27,4 @@ class Logout extends React.Component {
     }
 }
 
-export default Logout;
+export default withRouter(Logout);

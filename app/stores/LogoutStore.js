@@ -16,6 +16,7 @@ class LogoutStore {
 		this.user = null;
 		this.roles = null;
 		this.isUserAuthenticated = false;
+		window.localStorage.removeItem("isUserAuthenticated");
 	}
 
 }

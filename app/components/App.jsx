@@ -1,5 +1,6 @@
 import React from 'react';
 import Main from './Main';
+import { withRouter } from "react-router";
 
 import LoginPage from './Login/LoginPage';
 
@@ -14,9 +15,9 @@ class App extends React.Component {
 
 	render() {
 
-		// var isUserAuthenticated = window.localStorage.getItem("isUserAuthenticated");
+		var isUserAuthenticated = window.localStorage.getItem("isUserAuthenticated");
 
-		if(!this.props.isUserAuthenticated) {
+		if(!isUserAuthenticated) {
 			return <LoginPage/>;
 		}
 
@@ -27,4 +28,4 @@ class App extends React.Component {
 	}
 }
 
-export default App;
+export default withRouter(App);

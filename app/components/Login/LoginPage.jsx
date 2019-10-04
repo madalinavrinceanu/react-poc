@@ -27,9 +27,9 @@ class LoginPage extends React.Component {
 
 	render() {
 		return(
-			<div className="wrapper fadeInDown">
+			<div className="wrapper">
 				<div id="formContent">
-
+					<p><strong>Request Approval</strong></p>
 					<form onSubmit={this.onSubmit.bind(this)}>
 						<input type="text" id="login" required placeholder="username" name="login" className="fadeIn second"
 						       onChange={(event) => {

@@ -2,17 +2,17 @@ import React from 'react';
 import {Modal} from "react-bootstrap";
 import _ from "lodash";
 
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+
 import AssignApprover from "./AssignApprover";
-import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
 import RequestsStore from "../../stores/RequestsStore";
 import RequestsActions from "../../actions/RequestsActions";
-import LoginStore from "../../stores/LoginStore";
-import LoginActions from "../../actions/LoginActions";
 import AccountStore from "../../stores/AccountStore";
 import AccountActions from "../../actions/AccountActions";
 import CreateRequest from "./CreateRequest";
 
-@WithStoreSubscription([AccountStore], [AccountActions.fetchAccount.defer])
 class RequestsPage extends React.Component{
 
 	constructor() {
@@ -24,10 +24,10 @@ class RequestsPage extends React.Component{
 	}
 
 	componentDidMount() {
+		AccountStore.listen(this.onAccountStoreChanged);
+		AccountActions.fetchAccount.defer();
+
 		RequestsStore.listen(this.onRequestStoreChanged);
-		if(this.props.userId) {
-			RequestsActions.fetchRequests.defer(this.props.userId);
-		}
 	}
 
 	componentWillUnmount() {
@@ -39,10 +39,27 @@ class RequestsPage extends React.Component{
 		console.log(this.state);
 	};
 
-	onSubmitAssign(taskId) {
+	onAccountStoreChanged = store => {
+		this.setState({...store});
+		if(store.userId && this.state.requests.length === 0) {
+			RequestsActions.fetchRequests.defer(store.userId);
+		}
+	};
+
+	onSubmitAssign(taskId, number) {
 		event.preventDefault();
 		this.setState({showAssignModal:true});
 		RequestsActions.startTaskRequest(taskId);
+
+		if(number === 3) {
+			RequestsActions.completeRequest(
+				taskId,
+				{
+					thirdApprover: this.props.userId,
+					status3: "APPROVED"
+				}
+			);
+		}
 	}
 
 	onDecline(taskId, level) {
@@ -64,27 +81,34 @@ class RequestsPage extends React.Component{
 	}
 
 	render() {
-        const renderStatus = (request, number) => request["approver" + number] === this.props.userId ? (request["status" + number] === "PENDING" ?
-	        <div className="btn-group-sm" role="group" >
-                <button type="button" className="btn btn-primary" onClick={() => this.onSubmitAssign(request.taskId)}>Approve</button>
-                <button type="button" className="btn btn-secondary" onClick={() => this.onDecline(request.taskId, number)}>Decline</button>
-            </div>
+		const renderStatus = (request, number) => request["approver" + number] === this.state.userId ? (request["status" + number] === "PENDING" ?
+	        <span>
+		        <a href=""><FontAwesomeIcon style={{color:"green"}} icon={faCheck}  onClick={() => this.onSubmitAssign(request.taskId, number)}/></a>
+		        <a href=""><FontAwesomeIcon style={{color:"red"}} icon={faTimes} onClick={() => this.onDecline(request.taskId, number)}/></a>
+		        {this.renderAssignModal(request)}
+	        </span>
+
 	        : request["status" + number]) : request["status" + number];
 
 		const renderRequests = _.map(this.state.requests, request => {
             return (
 	            <React.Fragment>
-		            {this.renderAssignModal(request)}
 		            <tr key={request.processInstanceId}>
 			            <th scope="row">{request.processInstanceId}</th>
-			            <th>{request.date || '10 Sept 2019'}</th>
+			            <th>{request.date || '-'}</th>
 			            <td>{request.requesterName}</td>
-			            <td>{request.firstApproverName || '-'}</td>
-			            <td>{renderStatus(request, 1) || '-'}</td>
-			            <td>{request.secondApproverName || '-'}</td>
-			            <td>{renderStatus(request, 2) || '-'}</td>
-			            <td>{request.thirdApproverName || '-'}</td>
-			            <td>{renderStatus(request, 3) || '-'}</td>
+			            <td>
+				            <p>{request.approver1Name || '-'}</p>
+				            <p>{renderStatus(request, 1) || '-'}</p>
+			            </td>
+			            <td>
+				            <p>{request.approver2Name || '-'}</p>
+				            <p>{renderStatus(request, 2) || '-'}</p>
+			            </td>
+			            <td>
+				            <p>{request.approver3Name || '-'}</p>
+				            <p>{renderStatus(request, 3) || '-'}</p>
+			            </td>
 		            </tr>
 	            </React.Fragment>
             );
@@ -96,18 +120,15 @@ class RequestsPage extends React.Component{
 			{this.renderCreateButton()}
 
 			<div className="standard-container">
-				<table className="table table-striped">
+				<table className="table table-striped" style={{textAlign: "center"}}>
 					<thead>
 					<tr>
 						<th scope="col">PID</th>
 						<th scope="col">Date</th>
 						<th scope="col">Requester</th>
 						<th scope="col">First Approver</th>
-						<th scope="col">Status</th>
 						<th scope="col">Second Approver</th>
-						<th scope="col">Status</th>
 						<th scope="col">Third Approver</th>
-						<th scope="col">Status</th>
 					</tr>
 					</thead>
 					<tbody>
@@ -119,6 +140,7 @@ class RequestsPage extends React.Component{
 	}
 
 	renderAssignModal = (request) => {
+		if(request.status3 === "PENDING") return null;
 		return (
 			<Modal show={this.state.showAssignModal} onHide={() => this.onAssignCompleted()}>
 				<Modal.Header closeButton>
@@ -145,8 +167,8 @@ class RequestsPage extends React.Component{
 	};
 
 	renderCreateButton = () => {
-		return( this.props.roles ? (
-			this.props.roles.indexOf("REQUESTER_0") >= 0 ?
+		return( this.state.roles ? (
+			this.state.roles.indexOf("REQUESTER_0") >= 0 ?
 					<input type="submit" className="float-right" value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
 				: null ) : null
 		);

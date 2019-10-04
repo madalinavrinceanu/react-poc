@@ -5,11 +5,8 @@ export default class HttpUtils {
 	static getDefaultOptions() {
 		return {
 			baseURL: '',
-			// headers: {
-			// 	'Content-Type': 'application/json; charset=utf-8',
-			// 	'Accept': 'application/json, text/plain, */*'
-			// },
-			method: 'GET'
+			method: 'GET',
+			withCredentials: true
 		};
 	}
 }

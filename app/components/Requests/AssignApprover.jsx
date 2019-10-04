@@ -27,7 +27,6 @@ class AssignApprover extends React.Component {
 
 	onAccountStoreChanged = store => {
 		this.setState({...store});
-		console.log(this.state);
 	};
 
 	onSubmit() {
@@ -45,7 +44,6 @@ class AssignApprover extends React.Component {
 
 	inputChanged = (value) => {
 		this.setState({...value, formChanged: true});
-		console.log(this.state);
 	};
 
 	render() {
