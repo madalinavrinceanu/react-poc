@@ -1,6 +1,9 @@
 import React from 'react';
 import { withRouter } from "react-router";
 
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+
 import LogoutActions from "../../actions/LogoutActions";
 import LogoutStore from "../../stores/LogoutStore";
 import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
@@ -23,7 +26,7 @@ class Logout extends React.Component {
     }
 
     render() {
-        return <button className="btn btn-primary float-right" type="submit" onClick={()=> this.onSubmit()}>Logout</button>;
+        return <a href="" className="float-right pr-3"><FontAwesomeIcon style={{color:"blue"}} icon={faSignOutAlt}  onClick={() => this.onSubmit()}/></a>;
     }
 }
 

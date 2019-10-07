@@ -34,6 +34,7 @@ class AssignApprover extends React.Component {
 		var level = this.props.request.status1 === "PENDING" ? 2 : 3;
 		RequestsActions.completeRequest(
 				this.props.request.taskId,
+				this.state.userId,
 				{
 					[level === 2 ? 'secondApprover' : 'thirdApprover']: this.state.approver,
 					["status" + (level-1)]: "APPROVED"
@@ -44,6 +45,8 @@ class AssignApprover extends React.Component {
 
 	inputChanged = (value) => {
 		this.setState({...value, formChanged: true});
+		console.log(this.state);
+		console.log(this.props);
 	};
 
 	render() {

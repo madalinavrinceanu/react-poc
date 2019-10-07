@@ -4,7 +4,6 @@ import AccountActions from "../../actions/AccountActions";
 import WithStoreSubscription from "../Common/hocs/WithStoreSubscriptions";
 import AccountStore from "../../stores/AccountStore";
 
-// @WithStoreSubscription([AccountStore], [AccountActions.fetchUsersByRole.defer])
 class CreateRequest extends React.Component {
 
 	constructor() {
@@ -30,8 +29,10 @@ class CreateRequest extends React.Component {
 
 	onSubmit() {
 		event.preventDefault();
-		RequestsActions.createRequest({
-			requesterId: this.props.requesterId,
+		RequestsActions.createRequest(
+			this.state.userId,
+			{
+			requesterId: this.state.userId,
 			firstApprover: this.state.firstApprover
 		});
 		this.props.onCreateCompleted();

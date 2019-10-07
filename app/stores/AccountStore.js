@@ -24,6 +24,7 @@ class AccountStore {
 
 	fetchAccountComplete(data) {
 		this.user = data.login;
+		this.userName = data.firstName + " " + data.lastName;
 		this.userId = data.id;
 		this.roles = data.authorities;
 		this.isUserAuthenticated = true;

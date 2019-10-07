@@ -189,21 +189,21 @@ input[type=text]:placeholder {
 }
 
 .fadeIn.second {
-	-webkit-animation-delay: 0.6s;
-	-moz-animation-delay: 0.6s;
-	animation-delay: 0.6s;
+	-webkit-animation-delay: 0.2s;
+	-moz-animation-delay: 0.2s;
+	animation-delay: 0.2s;
 }
 
 .fadeIn.third {
-	-webkit-animation-delay: 0.8s;
-	-moz-animation-delay: 0.8s;
-	animation-delay: 0.8s;
+	-webkit-animation-delay: 0.3s;
+	-moz-animation-delay: 0.3s;
+	animation-delay: 0.3s;
 }
 
 .fadeIn.fourth {
-	-webkit-animation-delay: 1s;
-	-moz-animation-delay: 1s;
-	animation-delay: 1s;
+	-webkit-animation-delay: 0.4s;
+	-moz-animation-delay: 0.4s;
+	animation-delay: 0.4s;
 }
 
 /* Simple CSS3 Fade-in Animation */
@@ -226,6 +226,11 @@ input[type=text]:placeholder {
 
 #icon {
 	width:60%;
+}
+
+.table-header {
+	font-size: large;
+	font-weight: bold;
 }
 
 

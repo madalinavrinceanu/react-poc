@@ -5,6 +5,7 @@ import _ from "lodash";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 
 import AssignApprover from "./AssignApprover";
 import RequestsStore from "../../stores/RequestsStore";
@@ -19,7 +20,8 @@ class RequestsPage extends React.Component{
 		super();
 		this.state = {
 			requests: [],
-			fetchingRequests: false
+			fetchingRequests: false,
+			currentRequest: {}
 		};
 	}
 
@@ -46,25 +48,34 @@ class RequestsPage extends React.Component{
 		}
 	};
 
-	onSubmitAssign(taskId, number) {
+	onSubmitAssign(request, number) {
 		event.preventDefault();
-		this.setState({showAssignModal:true});
-		RequestsActions.startTaskRequest(taskId);
+		this.setState({showAssignModal:true, currentRequest: request});
+
+		//the task was already started, no need to start again.
+		if(request.taskStatus !== "InProgress") {
+			RequestsActions.startTaskRequest(request.taskId);
+			request.taskStatus = "InProgress";
+		}
 
 		if(number === 3) {
 			RequestsActions.completeRequest(
-				taskId,
+				request.taskId,
+				this.state.userId,
 				{
-					thirdApprover: this.props.userId,
+					thirdApprover: this.state.userId,
 					status3: "APPROVED"
 				}
 			);
 		}
 	}
 
-	onDecline(taskId, level) {
+	onDecline(request, level) {
 		event.preventDefault();
-		RequestsActions.declineRequest(taskId, {["status" + level] : "DECLINED"});
+		if(request.taskStatus !== "InProgress") {
+			RequestsActions.startTaskRequest(request.taskId);
+		}
+		RequestsActions.declineRequest(request.taskId, this.state.userId, {["status" + level] : "DECLINED"});
 	}
 
 	onAssignCompleted = () => {
@@ -81,47 +92,61 @@ class RequestsPage extends React.Component{
 	}
 
 	render() {
+
+		const displayStatus = (status) => {
+			if(status === "APPROVED") {
+				return <span style={{color: "#298A08", fontSize: "smaller"}}>APPROVED</span>;
+			}
+			if(status === "DECLINED") {
+				return <span style={{color: "#FF0000", fontSize: "smaller"}}>DECLINED</span>;
+			}
+			if(status === "PENDING") {
+				return <span style={{color: "#2E9AFE", fontSize: "smaller"}}>PENDING</span>;
+			}
+			return null;
+		};
+
 		const renderStatus = (request, number) => request["approver" + number] === this.state.userId ? (request["status" + number] === "PENDING" ?
 	        <span>
-		        <a href=""><FontAwesomeIcon style={{color:"green"}} icon={faCheck}  onClick={() => this.onSubmitAssign(request.taskId, number)}/></a>
-		        <a href=""><FontAwesomeIcon style={{color:"red"}} icon={faTimes} onClick={() => this.onDecline(request.taskId, number)}/></a>
-		        {this.renderAssignModal(request)}
+		        <a href=""><FontAwesomeIcon style={{color:"green", fontSize: "x-large", marginRight: "20px"}} icon={faCheck}  onClick={() => this.onSubmitAssign(request, number)}/></a>
+		        <a href=""><FontAwesomeIcon style={{color:"red", fontSize: "x-large", marginRight: "20px"}} icon={faTimes} onClick={() => this.onDecline(request, number)}/></a>
 	        </span>
 
-	        : request["status" + number]) : request["status" + number];
+	        : displayStatus(request["status" + number])) : displayStatus(request["status" + number]);
 
 		const renderRequests = _.map(this.state.requests, request => {
             return (
 	            <React.Fragment>
 		            <tr key={request.processInstanceId}>
-			            <th scope="row">{request.processInstanceId}</th>
-			            <th>{request.date || '-'}</th>
-			            <td>{request.requesterName}</td>
-			            <td>
+			            <td className="align-middle" scope="row">{request.processInstanceId}</td>
+			            <td className="align-middle">{request.date || '-'}</td>
+			            <td className="align-middle">{request.requesterName}</td>
+			            <td className="align-middle">
 				            <p>{request.approver1Name || '-'}</p>
-				            <p>{renderStatus(request, 1) || '-'}</p>
+				            <p style={{paddingTop: "5px"}}>{renderStatus(request, 1) || '-'}</p>
 			            </td>
-			            <td>
+			            <td className="align-middle">
 				            <p>{request.approver2Name || '-'}</p>
-				            <p>{renderStatus(request, 2) || '-'}</p>
+				            <p style={{paddingTop: "5px"}}>{renderStatus(request, 2) || '-'}</p>
 			            </td>
-			            <td>
+			            <td className="align-middle">
 				            <p>{request.approver3Name || '-'}</p>
-				            <p>{renderStatus(request, 3) || '-'}</p>
+				            <p style={{paddingTop: "5px"}}>{renderStatus(request, 3) || '-'}</p>
 			            </td>
 		            </tr>
 	            </React.Fragment>
             );
         });
 
+
 		return (<React.Fragment>
-			<h1>Requests</h1>
+			<h1 style={{padding: "30px 30px 0 30px"}}>Requests</h1>
 			{this.renderCreateModal()}
 			{this.renderCreateButton()}
 
 			<div className="standard-container">
 				<table className="table table-striped" style={{textAlign: "center"}}>
-					<thead>
+					<thead className="table-header">
 					<tr>
 						<th scope="col">PID</th>
 						<th scope="col">Date</th>
@@ -136,6 +161,7 @@ class RequestsPage extends React.Component{
 					</tbody>
 				</table>
 			</div>
+			{this.renderAssignModal(this.state.currentRequest)}
 			</React.Fragment>);
 	}
 
@@ -160,7 +186,7 @@ class RequestsPage extends React.Component{
 					<Modal.Title>Assign approver</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<CreateRequest onCreateCompleted={() => this.onCreateCompleted()} requesterId={this.props.userId}></CreateRequest>
+					<CreateRequest onCreateCompleted={() => this.onCreateCompleted()} requesterId={this.state.userId}></CreateRequest>
 				</Modal.Body>
 			</Modal>
 		);
@@ -169,7 +195,7 @@ class RequestsPage extends React.Component{
 	renderCreateButton = () => {
 		return( this.state.roles ? (
 			this.state.roles.indexOf("REQUESTER_0") >= 0 ?
-					<input type="submit" className="float-right" value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
+					<input type="submit" className="float-right" style={{margin: "30px 15px 0 0", backgroundColor: "#2E9AFE", padding:"15px 50px"}} value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
 				: null ) : null
 		);
 	}

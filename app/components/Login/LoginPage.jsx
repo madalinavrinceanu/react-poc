@@ -13,7 +13,6 @@ class LoginPage extends React.Component {
 	onSubmit() {
 		event.preventDefault(); //previne un refresh pentru ca submit face si render
 		console.log(this.state);
-		// this.state.isUserAuthenticated = true;
 		LoginActions.login({
 			username: this.state.username,
 			password: this.state.password,
@@ -29,7 +28,7 @@ class LoginPage extends React.Component {
 		return(
 			<div className="wrapper">
 				<div id="formContent">
-					<p><strong>Request Approval</strong></p>
+					<h1 className="pt-3">Request Approval</h1>
 					<form onSubmit={this.onSubmit.bind(this)}>
 						<input type="text" id="login" required placeholder="username" name="login" className="fadeIn second"
 						       onChange={(event) => {
@@ -40,7 +39,7 @@ class LoginPage extends React.Component {
 							       this.inputChanged({password: event.target.value});
 						       }}/>
 
-						<input type="submit" className="fadeIn fourth" value="Log In" disabled={!this.state.formChanged}/>
+						<input type="submit" className="fadeIn fourth pt-2" value="Log In" disabled={!this.state.formChanged}/>
 					</form>
 				</div>
 			</div>
