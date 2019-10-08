@@ -4,11 +4,15 @@ import RequestsActions from "../actions/RequestsActions";
 class RequestsStore {
     constructor() {
         this.requests = [];
+        this.statistics = {};
         this.fetchingRequests = false;
 
         this.bindListeners({
             handleFetchRequests: RequestsActions.fetchRequests,
-            handleFetchRequestsComplete: RequestsActions.fetchRequestsComplete
+            handleFetchRequestsComplete: RequestsActions.fetchRequestsComplete,
+	        handleFetchStatistics: RequestsActions.fetchStatistics,
+	        handleFetchStatisticsComplete: RequestsActions.fetchStatisticsComplete,
+
         });
     }
 
@@ -20,6 +24,14 @@ class RequestsStore {
     handleFetchRequestsComplete(requests) {
         this.fetchingRequests = false;
         this.requests = requests;
+    }
+
+    handleFetchStatistics() {
+        this.statistics = [];
+    }
+
+    handleFetchStatisticsComplete(statistics) {
+        this.statistics = statistics;
     }
 }
 

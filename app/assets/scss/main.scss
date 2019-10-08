@@ -48,6 +48,11 @@ h1 {
 	color: #596178;
 }
 
+.space-between {
+	display: flex;
+	justify-content: space-between;
+}
+
 
 .standard-container {
 	background-color: #ffffff;
@@ -231,6 +236,12 @@ input[type=text]:placeholder {
 .table-header {
 	font-size: large;
 	font-weight: bold;
+}
+
+.user-roles {
+	color: gray;
+	font-size: smaller;
+	padding-top: 0.5em;
 }
 
 

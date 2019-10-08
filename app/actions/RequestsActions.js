@@ -4,9 +4,13 @@ import HttpUtils from '../components/Common/HttpUtils';
 
 class RequestsActions {
 
-    fetchRequests(userId) {
+    fetchRequests(userId, page, size) {
         const requestOptions = HttpUtils.getDefaultOptions();
-        requestOptions.url = requestOptions.baseURL + 'api/requests/' + userId;
+        if(page && size) {
+	        requestOptions.url = requestOptions.baseURL + 'api/requests/' + userId + "?page=" + page + "&size=" + size;
+        } else {
+	        requestOptions.url = requestOptions.baseURL + 'api/requests/' + userId;
+        }
         requestOptions.method = 'GET';
 
         axios(requestOptions)
@@ -17,6 +21,7 @@ class RequestsActions {
     }
 
     fetchRequestsComplete(data) {
+    	this.fetchStatistics();
         return data;
     }
 
@@ -73,6 +78,24 @@ class RequestsActions {
 
 	    return null;
     }
+
+    fetchStatistics() {
+	    const requestOptions = HttpUtils.getDefaultOptions();
+	    requestOptions.url = requestOptions.baseURL + 'api/requests/statistics';
+
+	    requestOptions.method = 'GET';
+
+	    axios(requestOptions)
+		    .then((response) => this.fetchStatisticsComplete(response.data))
+		    .catch();
+
+	    return null;
+    }
+
+	fetchStatisticsComplete(data) {
+		return data;
+	}
+
 }
 
 export default alt.createActions(RequestsActions);

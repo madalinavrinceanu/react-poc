@@ -22,7 +22,7 @@ class App extends React.Component {
 		}
 
 		return (<div>
-			<HorizontalNavbar user={this.props.userName}/>
+			<HorizontalNavbar user={this.props.userName} roles={this.props.roles}/>
 			<Main></Main>
 		</div>);
 	}

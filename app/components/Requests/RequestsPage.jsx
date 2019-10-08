@@ -5,7 +5,9 @@ import _ from "lodash";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+
+import Pagination from "react-js-pagination";
+import ReactPaginate from 'react-paginate';
 
 import AssignApprover from "./AssignApprover";
 import RequestsStore from "../../stores/RequestsStore";
@@ -19,9 +21,11 @@ class RequestsPage extends React.Component{
 	constructor() {
 		super();
 		this.state = {
-			requests: [],
-			fetchingRequests: false,
-			currentRequest: {}
+			requests: {currentPage: [], totalCount: null},
+			activePage: 1,
+			pageSize: 5,
+			currentRequest: {},
+			statistics: {}
 		};
 	}
 
@@ -43,8 +47,9 @@ class RequestsPage extends React.Component{
 
 	onAccountStoreChanged = store => {
 		this.setState({...store});
-		if(store.userId && this.state.requests.length === 0) {
-			RequestsActions.fetchRequests.defer(store.userId);
+		if(store.userId && this.state.requests.currentPage && this.state.requests.currentPage.length === 0) {
+			RequestsActions.fetchRequests.defer(store.userId, this.state.activePage, this.state.pageSize);
+			RequestsActions.fetchStatistics.defer();
 		}
 	};
 
@@ -91,6 +96,10 @@ class RequestsPage extends React.Component{
 		this.setState({showCreateModal:false});
 	}
 
+	handlePageChange(pageNumber) {
+		this.setState({activePage: pageNumber});
+		RequestsActions.fetchRequests.defer(this.state.userId, pageNumber, this.state.pageSize);
+	}
 	render() {
 
 		const displayStatus = (status) => {
@@ -114,7 +123,7 @@ class RequestsPage extends React.Component{
 
 	        : displayStatus(request["status" + number])) : displayStatus(request["status" + number]);
 
-		const renderRequests = _.map(this.state.requests, request => {
+		const renderRequests = _.map(this.state.requests.currentPage, request => {
             return (
 	            <React.Fragment>
 		            <tr key={request.processInstanceId}>
@@ -138,12 +147,22 @@ class RequestsPage extends React.Component{
             );
         });
 
+		const renderStatistics = () => {
+			if(this.state.statistics.approvedRequests !== null) {
+				return <p className="float-left">
+					<span className="pr-5" style={{color: "#298A08"}}>{this.state.statistics.approvedRequests} Approved Request(s)</span>
+					<span className="pr-5" style={{color: "#2E9AFE"}}>{this.state.statistics.pendingRequests} Pending Request(s)</span>
+					<span className="pr-5" style={{color: "#FF0000"}}>{this.state.statistics.declinedRequests} Declined Request(s)</span>
+				</p>;
+			}
+		};
 
 		return (<React.Fragment>
-			<h1 style={{padding: "30px 30px 0 30px"}}>Requests</h1>
-			{this.renderCreateModal()}
-			{this.renderCreateButton()}
 
+			<h1 className="pt-5 space-between">Requests {this.renderCreateButton()}</h1>
+
+			{renderStatistics()}
+			{this.renderCreateModal()}
 			<div className="standard-container">
 				<table className="table table-striped" style={{textAlign: "center"}}>
 					<thead className="table-header">
@@ -160,6 +179,14 @@ class RequestsPage extends React.Component{
 						{renderRequests}
 					</tbody>
 				</table>
+				<div className="float-right">
+					<Pagination
+						activePage={this.state.activePage}
+						itemsCountPerPage={this.state.pageSize}
+						totalItemsCount={this.state.requests.totalCount}
+						onChange={this.handlePageChange.bind(this)}
+					/>
+				</div>
 			</div>
 			{this.renderAssignModal(this.state.currentRequest)}
 			</React.Fragment>);
@@ -195,7 +222,7 @@ class RequestsPage extends React.Component{
 	renderCreateButton = () => {
 		return( this.state.roles ? (
 			this.state.roles.indexOf("REQUESTER_0") >= 0 ?
-					<input type="submit" className="float-right" style={{margin: "30px 15px 0 0", backgroundColor: "#2E9AFE", padding:"15px 50px"}} value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
+					<input type="submit" style={{backgroundColor: "#2E9AFE", padding:"15px 50px"}} value="Create Request" onClick={this.onSubmitCreate.bind(this)}/>
 				: null ) : null
 		);
 	}

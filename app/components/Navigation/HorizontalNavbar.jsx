@@ -4,6 +4,9 @@ import { Navbar, Nav, NavItem } from "react-bootstrap";
 import Logout from "../Logout/Logout";
 
 const HorizontalNavbar = (props) => {
+
+    const roles = props.roles ? props.roles.toString() : null;
+
     return (
         <Navbar bg="light" variant="light">
 
@@ -11,7 +14,10 @@ const HorizontalNavbar = (props) => {
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav></Nav>
             </Navbar.Collapse>
-            <div style={{paddingRight : "20px"}}>{props.user}</div>
+            <span style={{paddingRight : "20px"}}>
+                <p>{props.user}</p>
+                <p className="user-roles">{roles}</p>
+            </span>
             <Logout></Logout>
         </Navbar>
     );
